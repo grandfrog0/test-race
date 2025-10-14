@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c7a324578a1f974883da5da19996753, type: 3}
+  m_Name: car 3
+  m_EditorClassIdentifier: 
+  Info:
+    Title: Car-3
+    Speed: 45
+    Braking: 40
+    Nitro: 75
+    Opened: 0
+    WheelColor: {r: 0, g: 0, b: 0, a: 0}
+    SmokeColor: {r: 0, g: 0, b: 0, a: 0}
+  Model: {fileID: 8583432085893240489, guid: d7908fad390fad5448f10d3d86951852, type: 3}
