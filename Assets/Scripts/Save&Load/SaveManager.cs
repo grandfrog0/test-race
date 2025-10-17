@@ -9,10 +9,7 @@ public class SaveManager : MonoBehaviour
     private static string _fileName = "save.json";
     public static string FolderPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), _folderName);
     public static string FilePath => Path.Combine(FolderPath, _fileName);
-    public static GameData Data { get => _instance._data; private set => _instance._data = value; }
-
-    private static SaveManager _instance;
-    private GameData _data;
+    public static GameData Data { get; set; }
 
     public static void SaveData()
     {
@@ -53,8 +50,8 @@ public class SaveManager : MonoBehaviour
 
     private void Awake()
     {
-        _instance = this;
-        LoadData();
+        if (Data == null)
+            LoadData();
     }
     private void OnApplicationQuit()
     {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +10,18 @@ public class TrackView : MonoBehaviour
     [SerializeField] Color _starActiveColor, _starDisactiveColor;
     [SerializeField] Text _bestTimeText;
     [SerializeField] Button _button;
+    [SerializeField] GameObject _outline;
+
+    private bool _isSelected;
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            _isSelected = value;
+            _outline.SetActive(value);
+        }
+    }
 
     private bool _isUnlocked;
     public bool IsUnlocked
@@ -48,9 +61,4 @@ public class TrackView : MonoBehaviour
         }
     }
     public int Index { get; set; }
-    public void OnClick()
-    {
-        if (IsUnlocked)
-            SceneLoader.LoadScene(Index);
-    }
 }

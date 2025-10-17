@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SceneLoadAnimation : MonoBehaviour
@@ -54,6 +55,7 @@ public class SceneLoadAnimation : MonoBehaviour
             _wheel.fillAmount = Mathf.Min(t, op.progress);
             yield return null;
         }
+        DynamicGI.UpdateEnvironment();
 
         for (float t = 0; t <= 1; t += Time.deltaTime * 2)
         {

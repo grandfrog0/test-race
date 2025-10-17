@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,36 @@ using UnityEngine;
 public class SelectTrackManager : MonoBehaviour
 {
     [SerializeField] List<TrackView> _tracks;
+    [SerializeField] GameObject _startButton;
+    private TrackView _selectedTrack;
+    public TrackView SelectedTrack
+    {
+        get => _selectedTrack;
+        set
+        {
+            if (_selectedTrack != null)
+                _selectedTrack.IsSelected = false;
+
+            if (_selectedTrack != value)
+            {
+                if (value.IsUnlocked)
+                {
+                    _selectedTrack = value;
+                    _selectedTrack.IsSelected = true;
+                }
+            }
+            else _selectedTrack = null;
+
+            _startButton.SetActive(_selectedTrack != null);
+        }
+    }
+    public void SetSelectedIndex(int index) => SelectedTrack = _tracks[index];
+    public void OpenSelectedTrack()
+    {
+        if (SelectedTrack.IsUnlocked)
+            SceneLoader.LoadScene(SelectedTrack.Index);
+    }
+
     private void Start()
     {
         UpdateTracks();

@@ -7,6 +7,8 @@ using UnityEngine.UIElements;
 public class CarModel : MonoBehaviour
 {
     [SerializeField] List<Renderer> _wheelsRenderers;
+    public WheelCollider WheelBL, WheelBR, WheelFL, WheelFR;
+
     public void Initialize(CarInfo info)
     {
         SetWheelsColor(info.WheelColor);
