@@ -5,6 +5,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Отвечает за настройку автомобилей
+/// </summary>
 public class VehiclesManager : MonoBehaviour
 {
     public static CarModel CurModel { get; private set; }

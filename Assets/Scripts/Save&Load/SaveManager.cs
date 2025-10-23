@@ -3,6 +3,9 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Отвечает за загрузку, хранение и выгрузку прогресса
+/// </summary>
 public class SaveManager : MonoBehaviour
 {
     private static string _folderName = "TestRace";

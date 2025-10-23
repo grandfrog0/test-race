@@ -1380,7 +1380,7 @@ RectTransform:
   m_Father: {fileID: 614283578}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.50210994, y: 1}
+  m_AnchorMax: {x: 0.50205755, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2439,10 +2439,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -4718,10 +4718,10 @@ PrefabInstance:
     - target: {fileID: 8124435356825781054, guid: 3c6858638f2f31a4f81422e850634791, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 922903886}
+      objectReference: {fileID: 922903887}
     - target: {fileID: 8124435356825781054, guid: 3c6858638f2f31a4f81422e850634791, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: LoadScene
+      value: SetSelectedIndex
       objectReference: {fileID: 0}
     - target: {fileID: 8124435356825781054, guid: 3c6858638f2f31a4f81422e850634791, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
@@ -6511,11 +6511,7 @@ PrefabInstance:
     - target: {fileID: 8124435356825781054, guid: 3c6858638f2f31a4f81422e850634791, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 922903886}
-    - target: {fileID: 8124435356825781054, guid: 3c6858638f2f31a4f81422e850634791, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: LoadScene
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 922903887}
     - target: {fileID: 8124435356825781054, guid: 3c6858638f2f31a4f81422e850634791, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
       value: 1
@@ -8202,7 +8198,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 212281744}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.50210994
+  m_Size: 0.50205755
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -8283,7 +8279,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -951.49994, y: -10}
+  m_AnchoredPosition: {x: -951.5, y: -10}
   m_SizeDelta: {x: 3790, y: -10}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1245714266

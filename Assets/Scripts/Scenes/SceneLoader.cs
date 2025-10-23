@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Загрузчик сцен
+/// </summary>
 public class SceneLoader : MonoBehaviour
 {
     public static void LoadScene(int index)

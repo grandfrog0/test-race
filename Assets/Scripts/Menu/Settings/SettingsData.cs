@@ -1,5 +1,8 @@
 using System;
 
+/// <summary>
+/// Сериализуемый объект, хранящий информацию о выбранных настройках
+/// </summary>
 [Serializable]
 public class SettingsData
 {

@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Отвечает за выбор трассы
+/// </summary>
 public class SelectTrackManager : MonoBehaviour
 {
     [SerializeField] List<TrackView> _tracks;

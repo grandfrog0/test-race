@@ -1,5 +1,8 @@
 using System;
 
+/// <summary>
+/// Сериализуемый объект, хранящий данные о трассе
+/// </summary>
 [Serializable]
 public class TrackInfo
 {

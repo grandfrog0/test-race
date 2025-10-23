@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Отображает текстовое обозначение даты с учетом установленного формата
+/// </summary>
 public class TimerText : MonoBehaviour
 {
     [SerializeField] Text _text;

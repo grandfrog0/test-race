@@ -3,6 +3,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Отвечает за графическое отображение информации о трассе
+/// </summary>
 public class TrackView : MonoBehaviour
 {
     [SerializeField] GameObject _lock;

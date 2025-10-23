@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Отвечает за обработку нажатий на клавиатуре
+/// </summary>
 public class InputManager : MonoBehaviour
 {
     [SerializeField] CarController _carController;
@@ -20,5 +23,9 @@ public class InputManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
             _pauseButton.Click();
+
+        if (Input.GetKey(KeyCode.LeftShift))
+            _carController.UseNitro();
+
     }
 }

@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Объект для сериализации данных о текущем прогрессе и настройках
+/// </summary>
 [Serializable]
 public class GameData
 {

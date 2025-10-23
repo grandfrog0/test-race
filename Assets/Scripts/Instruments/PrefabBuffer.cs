@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Содержит необходимые для сцены префабы
+/// </summary>
 public class PrefabBuffer : MonoBehaviour
 {
     public static PrefabBuffer instance;

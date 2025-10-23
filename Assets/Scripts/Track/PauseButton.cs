@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
+/// <summary>
+/// Кнопка паузы во время геймплея
+/// </summary>
 public class PauseButton : MonoBehaviour
 {
     [SerializeField] UnityEvent _onPause = new();

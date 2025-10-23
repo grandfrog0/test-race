@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Текст, отображающий текущую денежную сумму
+/// </summary>
 public class MoneyText : MonoBehaviour
 {
     [SerializeField] Text _text;

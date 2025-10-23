@@ -4,6 +4,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Скрипт детектора заноса автомобиля
+/// </summary>
 public class WheelDetector : MonoBehaviour
 {
     [SerializeField] Image _image;

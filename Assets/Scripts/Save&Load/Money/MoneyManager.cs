@@ -1,6 +1,9 @@
 ﻿
 using System;
 
+/// <summary>
+/// Обработка денежных транзакций
+/// </summary>
 public static class MoneyManager
 {
     public static int MoneyCount

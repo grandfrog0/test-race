@@ -6,6 +6,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>
+/// Анимация перехода между сценами
+/// </summary>
 public class SceneLoadAnimation : MonoBehaviour
 {
     private static SceneLoadAnimation _instance;

@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Скрипт мини-карты
+/// </summary>
 public class Minimap : MonoBehaviour
 {
     [SerializeField] RectTransform _rect;

@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Отвечает за покраску частей автомобиля
+/// </summary>
 public class CustomizeVehicleManager : MonoBehaviour
 {
     private ColorizeMode _colorizeMode = ColorizeMode.Wheels;

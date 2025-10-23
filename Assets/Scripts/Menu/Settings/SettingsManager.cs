@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Отвечает за отображение и редактирования настроек
+/// </summary>
 public class SettingsManager : MonoBehaviour
 {
     [SerializeField] Toggle _soundToggle, _musicToggle, _keyboardToggle;

@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Отвечает за вращение камеры вокруг автомобиля в главном меню
+/// </summary>
 public class RotateCamera : MonoBehaviour
 {
     [SerializeField] Transform _target;

@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Скрипт тахометра
+/// </summary>
 public class Tachometer : MonoBehaviour
 {
     [SerializeField] Transform _arrow;

@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Скрипт финишной прямой
+/// </summary>
 public class Finish : MonoBehaviour
 {
     [SerializeField] UnityEvent _onFinished;

@@ -1,6 +1,9 @@
 ﻿
 using UnityEngine;
 
+/// <summary>
+/// Камера заднего вида
+/// </summary>
 public class CameraBack : CameraController
 {
     [SerializeField] float _speed;

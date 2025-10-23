@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Камера, привязанная к автомобилю
+/// </summary>
 public class CameraController : MonoBehaviour
 {
     [SerializeField] protected CarController _car;
