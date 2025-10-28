@@ -51,6 +51,7 @@ MonoBehaviour:
   - {fileID: 4820515549228798045}
   - {fileID: 4817114426458919036}
   _smokePrefab: {fileID: 6137501271910765547, guid: 2c91e15a50ac8f14e8cd0d94b966f4e5, type: 3}
+  _trailPrefab: {fileID: 5979286233777727802, guid: 5084b4a41e2a1d3428f674a91129ecda, type: 3}
   WheelBL: {fileID: 9180287369866792458}
   WheelBR: {fileID: 3821118940416392030}
   WheelFL: {fileID: 2905387734251766750}

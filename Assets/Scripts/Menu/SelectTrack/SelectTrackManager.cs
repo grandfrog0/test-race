@@ -45,19 +45,21 @@ public class SelectTrackManager : MonoBehaviour
     }
     public void UpdateTracks()
     {
-        if (SaveManager.Data.Tracks.Count == 0)
+        if (SaveManager.Tracks.Count == 0)
         {
-            for(int i = 0; i < _tracks.Count; i++)
-                SaveManager.Data.Tracks.Add(new TrackInfo() { Index = i + 1 });
-            SaveManager.Data.Tracks[0].IsOpened = true;
+            for (int i = 0; i < _tracks.Count; i++)
+            {
+                string json = Resources.Load<TextAsset>("Configs/Tracks/track" + (i + 1)).text;
+                SaveManager.Tracks.Add(JsonUtility.FromJson<TrackInfo>(json));
+            }
         }
 
         for(int i = 0; i < _tracks.Count; i++)
         {
-            _tracks[i].Index = SaveManager.Data.Tracks[i].Index;
-            _tracks[i].IsUnlocked = SaveManager.Data.Tracks[i].IsOpened;
-            _tracks[i].StarsCount = SaveManager.Data.Tracks[i].Stars;
-            _tracks[i].BestTime = SaveManager.Data.Tracks[i].BestTime;
+            _tracks[i].Index = SaveManager.Tracks[i].Index;
+            _tracks[i].IsUnlocked = SaveManager.Tracks[i].IsOpened;
+            _tracks[i].StarsCount = SaveManager.Tracks[i].StarsCount;
+            _tracks[i].BestTime = SaveManager.Tracks[i].BestTime;
         }
     }
 }

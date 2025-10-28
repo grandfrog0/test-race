@@ -27,12 +27,12 @@ public class CustomizeVehicleManager : MonoBehaviour
 
     public void SetWheelsColor(Color color)
     {
-        if (SaveManager.Data.SelectedCar != null) SaveManager.Data.SelectedCar.WheelColor = color;
+        if (SaveManager.SelectedCar != null) SaveManager.SelectedCar.WheelColor = color;
         VehiclesManager.CurModel?.SetWheelsColor(color);
     }
     public void SetSmokeColor(Color color)
     {
-        if (SaveManager.Data.SelectedCar != null) SaveManager.Data.SelectedCar.SmokeColor = color;
+        if (SaveManager.SelectedCar != null) SaveManager.SelectedCar.SmokeColor = color;
         VehiclesManager.CurModel?.SetSmokeColor(color);
     }
 }

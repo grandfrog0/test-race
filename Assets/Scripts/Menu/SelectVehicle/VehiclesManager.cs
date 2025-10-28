@@ -23,11 +23,11 @@ public class VehiclesManager : MonoBehaviour
     {
         _carConfigs = PrefabBuffer.instance.DefaultCarConfigs;
 
-        SelectedIndex = SaveManager.Data.SelectedCarIndex;
+        SelectedIndex = SaveManager.PlayerData.SelectedCarIndex;
 
-        if (SaveManager.Data.Cars.Count == 0)
-            SaveManager.Data.Cars.AddRange(_carConfigs.Select(x => x.Info.Clone()));
-        SaveManager.Data.Cars[0].IsOpened = true;
+        if (SaveManager.Cars.Count == 0)
+            SaveManager.Cars.AddRange(_carConfigs.Select(x => x.Info.Clone()));
+        SaveManager.Cars[0].IsOpened = true;
 
         UpdateModel();
     }
@@ -48,23 +48,23 @@ public class VehiclesManager : MonoBehaviour
         if (CurModel)
             Destroy(CurModel.gameObject);
 
-        CurModel = Instantiate(SaveManager.Data.Cars[SelectedIndex].Model, _modelParent).GetComponent<CarModel>();
-        CurModel.Initialize(SaveManager.Data.Cars[SelectedIndex]);
-        _carNameText.text = SaveManager.Data.Cars[SelectedIndex].Title;
+        CurModel = Instantiate(SaveManager.Cars[SelectedIndex].Model, _modelParent).GetComponent<CarModel>();
+        CurModel.Initialize(SaveManager.Cars[SelectedIndex]);
+        _carNameText.text = SaveManager.Cars[SelectedIndex].Title;
 
-        _buyButton.gameObject.SetActive(!SaveManager.Data.Cars[SelectedIndex].IsOpened);
-        _customizeButton.gameObject.SetActive(SaveManager.Data.Cars[SelectedIndex].IsOpened);
+        _buyButton.gameObject.SetActive(!SaveManager.Cars[SelectedIndex].IsOpened);
+        _customizeButton.gameObject.SetActive(SaveManager.Cars[SelectedIndex].IsOpened);
 
-        if (SaveManager.Data.Cars[SelectedIndex].IsOpened) 
-            SaveManager.Data.SelectedCarIndex = SelectedIndex;
+        if (SaveManager.Cars[SelectedIndex].IsOpened) 
+            SaveManager.PlayerData.SelectedCarIndex = SelectedIndex;
     }
 
     public void TryBuyVehicle()
     {
-        if (SaveManager.Data.Cars[SelectedIndex].IsOpened || MoneyManager.MoneyCount < 3000)
+        if (SaveManager.Cars[SelectedIndex].IsOpened || MoneyManager.MoneyCount < 3000)
             return;
 
-        SaveManager.Data.Cars[SelectedIndex].IsOpened = true;
+        SaveManager.Cars[SelectedIndex].IsOpened = true;
         MoneyManager.MoneyCount -= 3000;
         UpdateModel();
     }

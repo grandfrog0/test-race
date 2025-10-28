@@ -31,4 +31,6 @@ public class CarInfo
         WheelColor = WheelColor,
         SmokeColor = SmokeColor
     };
+
+    public override string ToString() => $"{Title} ({IsOpened}) : ({Speed}, {Braking}, {Nitro})";
 }

@@ -1,0 +1,19 @@
+{
+    "Title": "Car-8",
+    "Speed": 45,
+    "Braking": 40,
+    "Nitro": 75,
+    "IsOpened": false,
+    "WheelColor": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 1.0
+    },
+    "SmokeColor": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 1.0
+    }
+}

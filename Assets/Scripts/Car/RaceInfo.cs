@@ -82,11 +82,11 @@ public class RaceInfo : MonoBehaviour
     /// </summary>
     private void FillData()
     {
-        SaveManager.Data.Tracks[_trackIndex].Stars = StarsCount;
-        SaveManager.Data.Tracks[_trackIndex].BestTime = Best;
-        if (StarsCount > 1 && SaveManager.Data.Tracks.Any(x => x.Index == _trackIndex + 1)
-            && _trackIndex + 1 < SaveManager.Data.Tracks.Count)
-            SaveManager.Data.Tracks[_trackIndex + 1].IsOpened = true;
+        SaveManager.Tracks[_trackIndex].StarsCount = StarsCount;
+        SaveManager.Tracks[_trackIndex].BestTime = Best;
+        if (StarsCount > 1 && SaveManager.Tracks.Any(x => x.Index == _trackIndex + 1)
+            && _trackIndex + 1 < SaveManager.Tracks.Count)
+            SaveManager.Tracks[_trackIndex + 1].IsOpened = true;
         SaveManager.SaveData();
     }
 
@@ -102,8 +102,9 @@ public class RaceInfo : MonoBehaviour
         if (_isDrifting != _car.IsDrifting)
         {
             _isDrifting = _car.IsDrifting;
-            Debug.Log("smoke is active: " + _isDrifting);
+
             _car.Model.SetSmokeActive(_isDrifting);
+            _car.Model.SetTrailActive(_isDrifting);
         }
 
         if (_car.IsDrifting)

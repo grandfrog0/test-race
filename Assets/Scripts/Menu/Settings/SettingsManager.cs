@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 /// <summary>
@@ -8,36 +9,48 @@ using UnityEngine.UI;
 /// </summary>
 public class SettingsManager : MonoBehaviour
 {
-    [SerializeField] Toggle _soundToggle, _musicToggle, _keyboardToggle;
+    [SerializeField] UnityEvent<bool> _onSoundOnChanged, _onMusicOnChanged;
+
+    [SerializeField] Toggle _soundToggle, _musicToggle;
+    [SerializeField] Toggle _keyboardControlToggle, _mouseControlToggle;
     [SerializeField] Slider _sensitivitySlider;
 
     public void Start()
         => UpdateSettingsWindow();
     public void UpdateSettingsWindow()
     {
-        QualitySettings.SetQualityLevel(SaveManager.Data.Settings.QualityLevel);
+        QualitySettings.SetQualityLevel(SaveManager.SettingsData.QualityLevel);
 
-        _soundToggle.isOn = SaveManager.Data.Settings.IsSoundOn;
-        _musicToggle.isOn = SaveManager.Data.Settings.IsMusicOn;
-        _keyboardToggle.isOn = SaveManager.Data.Settings.IsKeyboardOn;
-        _sensitivitySlider.value = SaveManager.Data.Settings.Sensitivity;
+        _soundToggle.isOn = SaveManager.SettingsData.IsSoundOn;
+        _musicToggle.isOn = SaveManager.SettingsData.IsMusicOn;
+        _keyboardControlToggle.isOn = SaveManager.SettingsData.IsKeyboardOn;
+        _mouseControlToggle.isOn = !_keyboardControlToggle.isOn;
+        _sensitivitySlider.value = SaveManager.SettingsData.Sensitivity;
     }
     public void SetQualityLevel(int value)
     {
-        SaveManager.Data.Settings.QualityLevel = value;
+        SaveManager.SettingsData.QualityLevel = value;
         QualitySettings.SetQualityLevel(value);
     }
     public void SetSoundOn(bool value)
-        => SaveManager.Data.Settings.IsSoundOn = value;
+    {
+        SaveManager.SettingsData.IsSoundOn = value;
+        _onSoundOnChanged.Invoke(!value);
+    }
     public void SetMusicOn(bool value)
-        => SaveManager.Data.Settings.IsMusicOn = value;
-    public void SetKeyboardOn(bool value)
-        => SaveManager.Data.Settings.IsKeyboardOn = value;
+    {
+        SaveManager.SettingsData.IsMusicOn = value;
+        _onMusicOnChanged.Invoke(!value);
+    }
+    public void SetKeyboardOn(bool value) 
+        => SaveManager.SettingsData.IsKeyboardOn = value;
+    public void SetMouseOn(bool value) 
+        => SetKeyboardOn(!value);
     public void SetSensitivityOn(float value)
-        => SaveManager.Data.Settings.Sensitivity = value;
+        => SaveManager.SettingsData.Sensitivity = value;
     public void ResetSettings()
     {
-        SaveManager.Data.Settings.Reset();
+        SaveManager.SettingsData.Reset();
         UpdateSettingsWindow();
     }
 }

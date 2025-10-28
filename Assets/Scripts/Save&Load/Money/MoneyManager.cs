@@ -8,12 +8,12 @@ public static class MoneyManager
 {
     public static int MoneyCount
     {
-        get => SaveManager.Data.MoneyCount;
+        get => SaveManager.PlayerData.MoneyCount;
         set
         {
             if (value < 0) return;
             int old = MoneyCount;
-            SaveManager.Data.MoneyCount = value;
+            SaveManager.PlayerData.MoneyCount = value;
             OnMoneyCountChanged?.Invoke(old, value);
         }
     }

@@ -7,7 +7,7 @@ using System;
 public class TrackInfo
 {
     public int Index;
-    public int Stars;
+    public int StarsCount;
     public float BestTime;
     public bool IsOpened;
 }

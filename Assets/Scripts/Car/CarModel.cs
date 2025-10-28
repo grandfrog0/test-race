@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// Свойства модели автомобиля
@@ -12,15 +8,19 @@ public class CarModel : MonoBehaviour
 {
     [SerializeField] List<Renderer> _wheelsRenderers;
     [SerializeField] ParticleSystem _smokePrefab;
+    [SerializeField] TrailRenderer _trailPrefab;
     private List<ParticleSystem> _smokeParticles;
+    private List<TrailRenderer> _trailParticles;
     public WheelCollider WheelBL, WheelBR, WheelFL, WheelFR;
 
     public void Initialize(CarInfo info)
     {
         _smokeParticles = new();
+        _trailParticles = new();
         foreach (WheelCollider c in new List<WheelCollider>() { WheelBL, WheelBR, WheelFL, WheelFR })
         {
             _smokeParticles.Add(Instantiate(_smokePrefab, c.transform.position, c.transform.rotation, c.transform));
+            _trailParticles.Add(Instantiate(_trailPrefab, c.transform.position - c.transform.localScale / 2, Quaternion.identity, transform));
         }
 
         SetWheelsColor(info.WheelColor);
@@ -43,7 +43,7 @@ public class CarModel : MonoBehaviour
     /// <param name="color">Новый цвет</param>
     public void SetSmokeColor(Color color)
     {
-        foreach(ParticleSystem p in _smokeParticles)
+        foreach (ParticleSystem p in _smokeParticles)
         {
             p.startColor = color == Color.clear ? Color.black : color;
         }
@@ -69,4 +69,12 @@ public class CarModel : MonoBehaviour
             }
         }
     }
+    public void SetTrailActive(bool value)
+    {
+        foreach (TrailRenderer tr in _trailParticles)
+        {
+            tr.emitting = value;
+        }
+    }
+
 }

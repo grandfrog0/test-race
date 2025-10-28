@@ -3,7 +3,13 @@ guid: cb54aa11587a21544982d5c72448c27c
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - _smokePrefab: {fileID: 6137501271910765547, guid: 2c91e15a50ac8f14e8cd0d94b966f4e5, type: 3}
+  - _trailPrefab: {fileID: 5979286233777727802, guid: 5084b4a41e2a1d3428f674a91129ecda, type: 3}
+  - WheelBL: {instanceID: 0}
+  - WheelBR: {instanceID: 0}
+  - WheelFL: {instanceID: 0}
+  - WheelFR: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

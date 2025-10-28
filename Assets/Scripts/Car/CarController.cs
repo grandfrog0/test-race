@@ -9,6 +9,7 @@ using UnityEngine.Events;
 public class CarController : MonoBehaviour
 {
     [SerializeField] Rigidbody _rigidbody;
+    [SerializeField] GroundChecker _groundChecker;
     [SerializeField] float _driveSpeed, _rotateSpeed, _brakeStrength, _maxDeflection, _nitroStrength;
 
     [SerializeField] CarModel _carModel;
@@ -22,7 +23,7 @@ public class CarController : MonoBehaviour
     /// <summary>
     /// Находится ли автомобиль в состоянии заноса
     /// </summary>
-    public bool IsDrifting => Velocity.magnitude > 1 && DriftAngle < 90 && DriftAngle > _maxDeflection;
+    public bool IsDrifting => _groundChecker.IsOnGround && Velocity.magnitude > 1 && DriftAngle < 90 && DriftAngle > _maxDeflection;
     /// <summary>
     /// Скорость автомобиля
     /// </summary>
@@ -35,17 +36,21 @@ public class CarController : MonoBehaviour
     /// Оставшийся запас нитро
     /// </summary>
     public float Nitro { get; set; } = 100;
+    public float DriveSpeed => _driveSpeed;
+    private float _startMass;
 
     private void Start()
     {
-        _carModel = Instantiate(SaveManager.Data.SelectedCar.Model, _rigidbody.transform).GetComponent<CarModel>();
-        _carModel.Initialize(SaveManager.Data.SelectedCar);
+        _carModel = Instantiate(SaveManager.SelectedCar.Model, _rigidbody.transform).GetComponent<CarModel>();
+        _carModel.Initialize(SaveManager.SelectedCar);
         _carModel.transform.Translate(0, -0.75f, 0);
 
         _frontLeftWheel = _carModel.WheelFL;
         _frontRightWheel = _carModel.WheelFR;
         _backLeftWheel = _carModel.WheelBL;
         _backRightWheel = _carModel.WheelBR;
+
+        _startMass = _rigidbody.mass;
     }
     
     /// <summary>
@@ -53,11 +58,21 @@ public class CarController : MonoBehaviour
     /// </summary>
     public void UseNitro()
     {
-        if (Nitro <= 0) 
+        if (Nitro <= 0)
+        {
+            StopNitro();
             return;
+        }
 
-        Nitro -= 10 * Time.deltaTime;
-        _rigidbody.AddForce(transform.forward * _nitroStrength, ForceMode.Acceleration);
+        Nitro -= 5  * Time.deltaTime;
+        _rigidbody.mass = _startMass / 5;
+    }
+    /// <summary>
+    /// Выключить нитро
+    /// </summary>
+    public void StopNitro()
+    {
+        _rigidbody.mass = _startMass;
     }
     /// <summary>
     /// Передать скорость и угол поворота
@@ -100,5 +115,32 @@ public class CarController : MonoBehaviour
         _frontRightWheel.brakeTorque = 0;
         _backLeftWheel.brakeTorque = 0;
         _backRightWheel.brakeTorque = 0;
+    }
+    /// <summary>
+    /// Ручной тормоз
+    /// </summary>
+    public void HandBrake()
+    {
+        _backLeftWheel.brakeTorque = _brakeStrength * 50;
+        _backRightWheel.brakeTorque = _brakeStrength * 50;
+
+        _backLeftWheel.motorTorque = 0;
+        _backRightWheel.motorTorque = 0;
+
+        _frontLeftWheel.brakeTorque = _brakeStrength * 50;
+        _frontRightWheel.brakeTorque = _brakeStrength * 50;
+
+        _frontLeftWheel.motorTorque = 0;
+        _frontRightWheel.motorTorque = 0;
+    }
+    /// <summary>
+    /// Снять с ручного тормоза
+    /// </summary>
+    public void ReleaseHandBrake()
+    {
+        _backLeftWheel.brakeTorque = 0;
+        _backRightWheel.brakeTorque = 0;
+        _frontLeftWheel.brakeTorque = 0;
+        _frontRightWheel.brakeTorque = 0;
     }
 }

@@ -7,17 +7,10 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c7a324578a1f974883da5da19996753, type: 3}
   m_Name: car 8
   m_EditorClassIdentifier: 
-  Info:
-    Title: Car-8
-    Speed: 45
-    Braking: 40
-    Nitro: 75
-    Opened: 0
-    WheelColor: {r: 0, g: 0, b: 0, a: 0}
-    SmokeColor: {r: 0, g: 0, b: 0, a: 0}
+  ConfigPath: Configs/Cars/car8
   Model: {fileID: 1754588696243795385, guid: 2d1513540e9236c42bb32e73a2512a08, type: 3}
