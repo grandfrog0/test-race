@@ -9,6 +9,7 @@ public class CarModel : MonoBehaviour
     [SerializeField] List<Renderer> _wheelsRenderers;
     [SerializeField] ParticleSystem _smokePrefab;
     [SerializeField] TrailRenderer _trailPrefab;
+    [SerializeField] GameObject _stopLights, _reverseLights;
     private List<ParticleSystem> _smokeParticles;
     private List<TrailRenderer> _trailParticles;
     public WheelCollider WheelBL, WheelBR, WheelFL, WheelFR;
@@ -76,5 +77,6 @@ public class CarModel : MonoBehaviour
             tr.emitting = value;
         }
     }
-
+    public void SetStopLightsActive(bool value) => _stopLights.SetActive(value);
+    public void SetReverseLightsActive(bool value) => _reverseLights.SetActive(value);
 }

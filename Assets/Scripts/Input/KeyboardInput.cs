@@ -16,7 +16,7 @@ public class KeyboardInput : MonoBehaviour
         _carController.SetAxis(axis);
         if (axis.y < 0)
         {
-            if (Input.GetButtonDown("Vertical"))
+            if (Input.GetButton("Vertical"))
                 _carController.BrakeTorque();
             if (Input.GetButtonUp("Vertical"))
                 _carController.ReleaseTorque();
@@ -25,12 +25,10 @@ public class KeyboardInput : MonoBehaviour
         if (Input.GetButtonDown("Jump"))
         {
             _carController.HandBrake();
-            _isHandBroken = true;
         }
-        else if (_isHandBroken)
+        else if (Input.GetButtonUp("Jump"))
         {
             _carController.ReleaseHandBrake();
-            _isHandBroken = false;
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))

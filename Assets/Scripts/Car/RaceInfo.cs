@@ -10,6 +10,8 @@ using UnityEngine.Events;
 public class RaceInfo : MonoBehaviour
 {
     [SerializeField] UnityEvent<float> _onDriftValueChanged = new();
+    [SerializeField] UnityEvent<float> _onRevolutionsChanged = new();
+    [SerializeField] UnityEvent<float> _onGearChanged = new();
     [SerializeField] UnityEvent<float> _onVelocityChanged = new();
     [SerializeField] UnityEvent<float> _onScoreChanged = new();
     [SerializeField] UnityEvent<float> _onTimerChanged = new();
@@ -53,7 +55,10 @@ public class RaceInfo : MonoBehaviour
     public float TrackCoins => _trackCoins;
 
     [SerializeField] CarController _car;
+    private CarTransmission _carTransmission;
     private Vector2 _oldVelocity;
+    private float _oldRevolutions;
+    private int _oldGear;
     private float _nitro;
     private bool _isDrifting = false;
 
@@ -99,6 +104,18 @@ public class RaceInfo : MonoBehaviour
             _oldVelocity = velocity;
         }
 
+        if (_car.EngineRPM != _oldRevolutions)
+        {
+            _onRevolutionsChanged.Invoke(_car.EngineRPM);
+            _oldRevolutions = _car.EngineRPM;
+        }
+
+        if (_carTransmission.CurrentGear != _oldGear)
+        {
+            _onGearChanged.Invoke(_carTransmission.CurrentGear);
+            _oldGear = _carTransmission.CurrentGear;
+        }
+
         if (_isDrifting != _car.IsDrifting)
         {
             _isDrifting = _car.IsDrifting;
@@ -136,6 +153,7 @@ public class RaceInfo : MonoBehaviour
 
     private void Start()
     {
+        _carTransmission = _car.GetComponent<CarTransmission>();
         _onBestChanged.Invoke(Best);
     }
 }

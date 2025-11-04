@@ -873,6 +873,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c79630368fce7a34e8728b68e0df74fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 563487135}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c79630368fce7a34e8728b68e0df74fc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 563487136}
   m_SourcePrefab: {fileID: 100100000, guid: c79630368fce7a34e8728b68e0df74fc, type: 3}
 --- !u!4 &242907853 stripped
 Transform:
@@ -1839,7 +1842,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrow: {fileID: 602229314}
   _minMaxAngle: {x: 180, y: -90}
-  _maxSpeed: 300
+  _maxSpeed: 10000
 --- !u!1 &563487129 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c79630368fce7a34e8728b68e0df74fc, type: 3}
@@ -1908,7 +1911,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rigidbody: {fileID: 563487132}
   _groundChecker: {fileID: 563487135}
-  _driveSpeed: 2000
   _rotateSpeed: 15
   _brakeStrength: 4000
   _maxDeflection: 10
@@ -1930,6 +1932,18 @@ MonoBehaviour:
   _groundMask:
     serializedVersion: 2
     m_Bits: 8
+--- !u!114 &563487136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563487129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62118c4e184c19c4e8bdda1ee84ec505, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &590497558
 GameObject:
   m_ObjectHideFlags: 0
@@ -3430,7 +3444,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  _onVelocityChanged:
+  _onRevolutionsChanged:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 520372154}
@@ -3445,6 +3459,24 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _onGearChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1499700484}
+        m_TargetAssemblyTypeName: FormattedText, Assembly-CSharp
+        m_MethodName: SetValue
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  _onVelocityChanged:
+    m_PersistentCalls:
+      m_Calls:
       - m_Target: {fileID: 1942852395}
         m_TargetAssemblyTypeName: FormattedText, Assembly-CSharp
         m_MethodName: SetValue
@@ -4047,7 +4079,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _car: {fileID: 563487134}
-  _multiplier: 1000
+  _multiplier: 0.1
 --- !u!1 &1247265059
 GameObject:
   m_ObjectHideFlags: 0
@@ -4935,6 +4967,7 @@ GameObject:
   - component: {fileID: 1499700481}
   - component: {fileID: 1499700483}
   - component: {fileID: 1499700482}
+  - component: {fileID: 1499700484}
   m_Layer: 5
   m_Name: Km/h Text (1)
   m_TagString: Untagged
@@ -4994,7 +5027,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 3
+  m_Text: 1
 --- !u!222 &1499700483
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5003,6 +5036,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1499700480}
   m_CullTransparentMesh: 1
+--- !u!114 &1499700484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1499700480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 921a7f6f4b02b2346a9835d7ee3d44cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _text: {fileID: 1499700482}
+  _format: '{0}'
 --- !u!1 &1508121791
 GameObject:
   m_ObjectHideFlags: 0
