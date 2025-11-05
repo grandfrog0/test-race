@@ -10,7 +10,8 @@ public class MouseInput : MonoBehaviour
 {
     [SerializeField] CarController _carController;
     [SerializeField] PauseButton _pauseButton;
-    private bool _isHandBroken;
+    private CarTransmission _carTransmission;
+    private float _lastMouse0PressedTime;
 
     private float _mouseDelta => Input.GetAxis("Mouse X");
 
@@ -25,16 +26,20 @@ public class MouseInput : MonoBehaviour
             if (Input.GetMouseButtonUp(ToInt(Input.GetMouseButton(1))))
                 _carController.ReleaseTorque();
         }
+        else if (axis.y > 0 && Input.GetMouseButtonDown(0))
+        {
+            if (Time.time - _lastMouse0PressedTime < .75f)
+                _carTransmission.ToggleTransmission();
+            _lastMouse0PressedTime = Time.time;
+        }
 
         if (Input.GetMouseButton(0) && Input.GetMouseButton(1))
         {
             _carController.HandBrake();
-            _isHandBroken = true;
         }
-        else if (_isHandBroken)
+        else if (Input.GetMouseButtonUp(0) && Input.GetMouseButtonUp(1))
         {
             _carController.ReleaseHandBrake();
-            _isHandBroken = false;
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -44,10 +49,16 @@ public class MouseInput : MonoBehaviour
             _carController.UseNitro();
         else if (Input.GetMouseButtonDown(2))
             _carController.StopNitro();
+
+        if (Input.GetMouseButtonDown(3))
+            _carTransmission.ShiftTo(false);
+        else if (Input.GetMouseButtonDown(4))
+            _carTransmission.ShiftTo(true);
     }
     private void OnEnable()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        _carTransmission = _carController.GetComponent<CarTransmission>();
     }
     private void OnDisable()
     {

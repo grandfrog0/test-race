@@ -9,7 +9,9 @@ public class KeyboardInput : MonoBehaviour
 {
     [SerializeField] CarController _carController;
     [SerializeField] PauseButton _pauseButton;
-    private bool _isHandBroken;
+    private CarTransmission _carTransmission;
+    private float _lastWPressedTime;
+
     public void Update()
     {
         Vector2 axis = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
@@ -20,6 +22,12 @@ public class KeyboardInput : MonoBehaviour
                 _carController.BrakeTorque();
             if (Input.GetButtonUp("Vertical"))
                 _carController.ReleaseTorque();
+        }
+        else if (axis.y > 0 && Input.GetButtonDown("Vertical"))
+        {
+            if (Time.time - _lastWPressedTime < .75f)
+                _carTransmission.ToggleTransmission();
+            _lastWPressedTime = Time.time;
         }
 
         if (Input.GetButtonDown("Jump"))
@@ -38,5 +46,15 @@ public class KeyboardInput : MonoBehaviour
             _carController.UseNitro();
         else if (Input.GetKeyUp(KeyCode.LeftShift))
             _carController.StopNitro();
+
+        if (Input.GetKeyDown(KeyCode.Q))
+            _carTransmission.ShiftTo(false);
+        else if (Input.GetKeyDown(KeyCode.E))
+            _carTransmission.ShiftTo(true);
+    }
+
+    private void Start()
+    {
+        _carTransmission = _carController.GetComponent<CarTransmission>();
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CarTransmission : MonoBehaviour
@@ -16,71 +17,58 @@ public class CarTransmission : MonoBehaviour
 
     private int _currentGear = 1;
     public int CurrentGear => _currentGear;
-    private bool _isShifting = false;
 
     private CarController _controller;
     private CarModel _model;
     private List<WheelCollider> _wheelColliders;
     private float _lastShiftTime;
+    private Coroutine _coroutine;
 
     void Start()
     {
         _controller = GetComponent<CarController>();
         _model = _controller.Model;
         _wheelColliders = new(){ _model.WheelFR, _model.WheelFL, _model.WheelBL, _model.WheelBR };
+
+        _coroutine = StartCoroutine(HandleAutomaticTransmission());
     }
 
-    void Update()
+    private IEnumerator HandleAutomaticTransmission()
     {
-        // Переключение
-        if (Input.GetKeyDown(KeyCode.M))
+        while (true)
         {
-            ToggleTransmissionType();
-        }
+            if (Time.time - _lastShiftTime < _shiftDelay)
+            {
+                yield return new WaitForSeconds(0.1f);
+                continue;
+            }
 
+            // Повышение передачи
+            if (_currentGear > 0 && _currentGear < _gearRatios.Length &&
+                _controller.EngineRPM > _shiftUpRPM[_currentGear - 1])
+            {
+                ShiftUp();
+            }
+            // Понижение передачи
+            else if (_currentGear > 1 && _controller.EngineRPM < _shiftDownRPM[_currentGear - 2])
+            {
+                ShiftDown();
+            }
+            
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    public void ShiftTo(bool up)
+    {
         if (_isAutomatic)
-        {
-            HandleAutomaticTransmission();
-        }
-        else
-        {
-            HandleManualTransmission();
-        }
-
-        ApplyGearRatio();
-    }
-
-    void HandleAutomaticTransmission()
-    {
-        if (_isShifting || Time.time - _lastShiftTime < _shiftDelay) 
             return;
 
-        float currentRPM = GetEngineRPM();
-
-        // Повышение передачи
-        if (_currentGear > 0 && _currentGear < _gearRatios.Length &&
-            currentRPM > _shiftUpRPM[_currentGear - 1])
+        if (up)
         {
             ShiftUp();
         }
-        // Понижение передачи
-        else if (_currentGear > 1 && currentRPM < _shiftDownRPM[_currentGear - 2])
-        {
-            ShiftDown();
-        }
-    }
-
-    void HandleManualTransmission()
-    {
-        if (_isShifting) return;
-
-        // Переключение на повышенную передачу
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            ShiftUp();
-        }
-        // Переключение на пониженную передачу
-        else if (Input.GetKeyDown(KeyCode.Q))
+        else
         {
             ShiftDown();
         }
@@ -90,7 +78,7 @@ public class CarTransmission : MonoBehaviour
     {
         if (_currentGear < _gearRatios.Length)
         {
-            StartCoroutine(PerformShift(_currentGear + 1));
+            PerformShift(_currentGear + 1);
         }
     }
 
@@ -98,74 +86,52 @@ public class CarTransmission : MonoBehaviour
     {
         if (_currentGear > 1)
         {
-            StartCoroutine(PerformShift(_currentGear - 1));
+            PerformShift(_currentGear - 1);
         }
     }
 
-    private IEnumerator PerformShift(int targetGear)
+    private void PerformShift(int targetGear)
     {
-        _isShifting = true;
         _lastShiftTime = Time.time;
 
-        // Симуляция задержки переключения
-        yield return new WaitForSeconds(0.1f);
-
         _currentGear = targetGear;
-        _isShifting = false;
+
+        ApplyGearRatio();
 
         Debug.Log($"Переключение на передачу: {targetGear}");
     }
 
-    void ApplyGearRatio()
+    private void ApplyGearRatio()
     {
         if (_controller == null) return;
 
         float gearRatio = 0f;
 
-        if (_currentGear == -1) // Задняя передача
+        if (_currentGear == -1)
         {
             gearRatio = _reverseGearRatio * _finalDriveRatio;
         }
-        else if (_currentGear > 0 && _currentGear <= _gearRatios.Length) // Передние передачи
+        else if (_currentGear > 0 && _currentGear <= _gearRatios.Length)
         {
             gearRatio = _gearRatios[_currentGear - 1] * _finalDriveRatio;
         }
 
-        // Применяем передаточное число к двигателю
         _controller.GearRatio = gearRatio;
     }
 
-    public void ToggleTransmissionType()
+    public void ToggleTransmission()
     {
         _isAutomatic = !_isAutomatic;
 
-        Debug.Log($"Режим: {(_isAutomatic ? "Автомат" : "Ручной")}");
-    }
-
-    float GetEngineRPM()
-    {
-        // Получаем RPM от двигателя автомобиля
-        if (_controller != null)
+        if (!_coroutine.IsUnityNull())
         {
-            return _controller.EngineRPM;
+            StopCoroutine(_coroutine);
+        }
+        if (_isAutomatic)
+        {
+            _coroutine = StartCoroutine(HandleAutomaticTransmission());
         }
 
-        // Запасной вариант расчета RPM
-        float wheelRPM = 0f;
-        foreach (var wheel in _wheelColliders)
-        {
-            wheelRPM += Mathf.Abs(wheel.rpm);
-        }
-        wheelRPM /= _wheelColliders.Count;
-
-        float currentGearRatio = _currentGear == -1 ? _reverseGearRatio :
-                                (_currentGear > 0 ? _gearRatios[_currentGear - 1] : 1f);
-
-        return wheelRPM * currentGearRatio * _finalDriveRatio;
-    }
-
-    float GetCarSpeed()
-    {
-        return GetComponent<Rigidbody>().velocity.magnitude * 3.6f; // км/ч
+        Debug.Log("Режим: " + (_isAutomatic ? "Автомат" : "Ручной"));
     }
 }
