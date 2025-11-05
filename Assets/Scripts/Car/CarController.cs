@@ -10,13 +10,11 @@ public class CarController : MonoBehaviour
 {
     [SerializeField] Rigidbody _rigidbody;
     [SerializeField] GroundChecker _groundChecker;
-    //[SerializeField] float _driveSpeed;
     [SerializeField] float _rotateSpeed, _brakeStrength, _maxDeflection, _nitroStrength;
 
     [SerializeField] CarModel _carModel;
     private WheelCollider _frontLeftWheel, _frontRightWheel;
     private WheelCollider _backLeftWheel, _backRightWheel;
-    private WheelCollider[] _wheelColliders;
     
     /// <summary>
     /// Свойство доступа к модели автомобиля
@@ -38,16 +36,16 @@ public class CarController : MonoBehaviour
     /// Оставшийся запас нитро
     /// </summary>
     public float Nitro { get; set; } = 100;
-    //public float DriveSpeed => _driveSpeed * _speedMultiplier;
-    //private float _speedMultiplier = 1;
     private float _startMass;
     private bool _isHandBroken;
+    private bool _isTorqueReleased = true;
     private Vector2 _axis;
 
     // настройка передач и оборотов
+    private CarTransmission _transmission;
     private float _maxMotorTorque = 1500;
     private float _maxRPM = 7000f;
-    private float _minRPM = 1000f;
+    private float _minRPM = 500f;
     private float _currentMotorTorque;
     private float _engineRPM;
     private float _gearRatio = 1f;
@@ -57,9 +55,12 @@ public class CarController : MonoBehaviour
         set => _gearRatio = Mathf.Max(value, 0.1f);
     }
     public float EngineRPM => _engineRPM;
+    public bool IsStalled { get; set; } // заглох ли автомобиль
 
     private void Start()
     {
+        _transmission = GetComponent<CarTransmission>();
+
         _carModel = Instantiate(SaveManager.SelectedCar.Model, _rigidbody.transform).GetComponent<CarModel>();
         _carModel.Initialize(SaveManager.SelectedCar);
         _carModel.transform.Translate(0, -0.75f, 0);
@@ -68,8 +69,6 @@ public class CarController : MonoBehaviour
         _frontRightWheel = _carModel.WheelFR;
         _backLeftWheel = _carModel.WheelBL;
         _backRightWheel = _carModel.WheelBR;
-
-        _wheelColliders = new WheelCollider[]{ _frontLeftWheel, _frontRightWheel, _backLeftWheel, _backRightWheel };
 
         _startMass = _rigidbody.mass;
     }
@@ -101,13 +100,31 @@ public class CarController : MonoBehaviour
     /// <param name="axis"></param>
     public void SetAxis(Vector2 axis)
     {
-        if (_isHandBroken) 
+        if (_isTorqueReleased && !_transmission.IsAutomatic)
+        {
+            if (!IsStalled)
+            {
+                if (_engineRPM < 1000 && _currentMotorTorque > 0 && !(DriftAngle > 90 && _rigidbody.velocity.magnitude > 1))
+                    IsStalled = true;
+            }
+            else
+            {
+                if (_transmission.IsClutchPressed && axis.y != 0)
+                {
+                    IsStalled = false;
+                }
+            }
+        }
+        if (_transmission.IsAutomatic)
+            IsStalled = false;
+
+        if (_isHandBroken || IsStalled) 
             return;
 
         float targetRPM = axis.y > 0 ?
             _minRPM + axis.y * (_maxRPM - _minRPM) : 
             _minRPM;
-        _engineRPM = Mathf.Lerp(_engineRPM, targetRPM, Time.deltaTime * 2f);
+        _engineRPM = Mathf.Lerp(_engineRPM, targetRPM, Time.deltaTime * 0.5f);
         _engineRPM = Mathf.Clamp(_engineRPM, _minRPM, _maxRPM);
 
         _currentMotorTorque = axis.y * _maxMotorTorque / _gearRatio;
@@ -142,6 +159,8 @@ public class CarController : MonoBehaviour
             _frontRightWheel.motorTorque = 0;
             _backLeftWheel.motorTorque = 0;
             _backRightWheel.motorTorque = 0;
+
+            _isTorqueReleased = false;
         }
         else
         {
@@ -157,6 +176,8 @@ public class CarController : MonoBehaviour
         _frontRightWheel.brakeTorque = 0;
         _backLeftWheel.brakeTorque = 0;
         _backRightWheel.brakeTorque = 0;
+        
+        _isTorqueReleased = true;
     }
     /// <summary>
     /// Ручной тормоз
@@ -170,12 +191,6 @@ public class CarController : MonoBehaviour
 
         _backLeftWheel.motorTorque = 0;
         _backRightWheel.motorTorque = 0;
-
-        //_frontLeftWheel.brakeTorque = _brakeStrength * 50;
-        //_frontRightWheel.brakeTorque = _brakeStrength * 50;
-
-        //_frontLeftWheel.motorTorque = 0;
-        //_frontRightWheel.motorTorque = 0;
     }
     /// <summary>
     /// Снять с ручного тормоза
@@ -186,7 +201,5 @@ public class CarController : MonoBehaviour
 
         _backLeftWheel.brakeTorque = 0;
         _backRightWheel.brakeTorque = 0;
-        //_frontLeftWheel.brakeTorque = 0;
-        //_frontRightWheel.brakeTorque = 0;
     }
 }

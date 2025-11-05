@@ -6,6 +6,7 @@ using UnityEngine;
 public class CarTransmission : MonoBehaviour
 {
     private bool _isAutomatic = true;
+    public bool IsAutomatic => _isAutomatic;
 
     private float[] _gearRatios = { 3.5f, 2.5f, 1.8f, 1.3f, 1.0f, 0.8f };
     private float _reverseGearRatio = -3.0f;
@@ -17,6 +18,7 @@ public class CarTransmission : MonoBehaviour
 
     private int _currentGear = 1;
     public int CurrentGear => _currentGear;
+    public bool IsClutchPressed { get; set; } = false;
 
     private CarController _controller;
     private CarModel _model;
@@ -61,7 +63,7 @@ public class CarTransmission : MonoBehaviour
 
     public void ShiftTo(bool up)
     {
-        if (_isAutomatic)
+        if (_isAutomatic || !IsClutchPressed)
             return;
 
         if (up)

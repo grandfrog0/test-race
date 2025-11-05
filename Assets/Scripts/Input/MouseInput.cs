@@ -54,6 +54,11 @@ public class MouseInput : MonoBehaviour
             _carTransmission.ShiftTo(false);
         else if (Input.GetMouseButtonDown(4))
             _carTransmission.ShiftTo(true);
+
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+            _carTransmission.IsClutchPressed = true;
+        else if (Input.GetKeyUp(KeyCode.LeftControl))
+            _carTransmission.IsClutchPressed = false;
     }
     private void OnEnable()
     {

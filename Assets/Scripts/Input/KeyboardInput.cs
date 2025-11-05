@@ -51,6 +51,12 @@ public class KeyboardInput : MonoBehaviour
             _carTransmission.ShiftTo(false);
         else if (Input.GetKeyDown(KeyCode.E))
             _carTransmission.ShiftTo(true);
+
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+            _carTransmission.IsClutchPressed = true;
+        else if (Input.GetKeyUp(KeyCode.LeftControl))
+            _carTransmission.IsClutchPressed = false;
+
     }
 
     private void Start()
