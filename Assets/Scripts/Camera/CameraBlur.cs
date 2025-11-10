@@ -9,7 +9,10 @@ public class CameraBlur : MonoBehaviour
     private float _startFieldOfView;
     public void SetSpeed(float value)
     {
-        if (_car.GearRatio  0) Camera.main.fieldOfView = _startFieldOfView + value / _car.GearRatio * _multiplier;
+        if (_car.GearRatio > 0)
+        {
+            Camera.main.fieldOfView = _startFieldOfView + value / _car.GearRatio * _multiplier;
+        }
     }
     private void Start()
     {
