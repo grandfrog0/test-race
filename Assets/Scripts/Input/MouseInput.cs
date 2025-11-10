@@ -26,18 +26,21 @@ public class MouseInput : MonoBehaviour
             if (Input.GetMouseButtonUp(ToInt(Input.GetMouseButton(1))))
                 _carController.ReleaseTorque();
         }
-        else if (axis.y > 0 && Input.GetMouseButtonDown(0))
+        if (Input.GetKeyDown(KeyCode.M))
         {
-            if (Time.time - _lastMouse0PressedTime < .75f)
-                _carTransmission.ToggleTransmission();
-            _lastMouse0PressedTime = Time.time;
+            _carTransmission.ToggleTransmission();
+        } 
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            _carTransmission.CurrentGear = -1;
         }
+
 
         if (Input.GetMouseButton(0) && Input.GetMouseButton(1))
         {
             _carController.HandBrake();
         }
-        else if (Input.GetMouseButtonUp(0) && Input.GetMouseButtonUp(1))
+        else if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
         {
             _carController.ReleaseHandBrake();
         }

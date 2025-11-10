@@ -17,7 +17,7 @@ public class CarTransmission : MonoBehaviour
     private float _shiftDelay = 0.5f;
 
     private int _currentGear = 1;
-    public int CurrentGear => _currentGear;
+    public int CurrentGear { get => _currentGear; set => _currentGear = value; }
     public bool IsClutchPressed { get; set; } = false;
 
     private CarController _controller;
@@ -86,7 +86,7 @@ public class CarTransmission : MonoBehaviour
 
     public void ShiftDown()
     {
-        if (_currentGear > 1)
+        if (_currentGear > -1)
         {
             PerformShift(_currentGear - 1);
         }

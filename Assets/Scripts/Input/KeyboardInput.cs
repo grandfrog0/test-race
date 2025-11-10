@@ -10,7 +10,6 @@ public class KeyboardInput : MonoBehaviour
     [SerializeField] CarController _carController;
     [SerializeField] PauseButton _pauseButton;
     private CarTransmission _carTransmission;
-    private float _lastWPressedTime;
 
     public void Update()
     {
@@ -23,11 +22,13 @@ public class KeyboardInput : MonoBehaviour
             if (Input.GetButtonUp("Vertical"))
                 _carController.ReleaseTorque();
         }
-        else if (axis.y > 0 && Input.GetButtonDown("Vertical"))
+        if (Input.GetKeyDown(KeyCode.F))
         {
-            if (Time.time - _lastWPressedTime < .75f)
-                _carTransmission.ToggleTransmission();
-            _lastWPressedTime = Time.time;
+            _carTransmission.ToggleTransmission();
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            _carTransmission.CurrentGear = -1;
         }
 
         if (Input.GetButtonDown("Jump"))

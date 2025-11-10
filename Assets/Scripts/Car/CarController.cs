@@ -115,11 +115,9 @@ public class CarController : MonoBehaviour
                 }
             }
         }
+
         if (_transmission.IsAutomatic)
             IsStalled = false;
-
-        if (_isHandBroken || IsStalled) 
-            return;
 
         float targetRPM = axis.y > 0 ?
             _minRPM + axis.y * (_maxRPM - _minRPM) : 
@@ -129,10 +127,13 @@ public class CarController : MonoBehaviour
 
         _currentMotorTorque = axis.y * _maxMotorTorque / _gearRatio;
 
-        _frontLeftWheel.motorTorque = _currentMotorTorque * 5;
-        _frontRightWheel.motorTorque = _currentMotorTorque * 5;
-        _backLeftWheel.motorTorque = _currentMotorTorque * 5;
-        _backRightWheel.motorTorque = _currentMotorTorque * 5;
+        if (!_isHandBroken && !IsStalled && _transmission.CurrentGear != 0)
+        {
+            _frontLeftWheel.motorTorque = _currentMotorTorque * 5;
+            _frontRightWheel.motorTorque = _currentMotorTorque * 5;
+            _backLeftWheel.motorTorque = _currentMotorTorque * 5;
+            _backRightWheel.motorTorque = _currentMotorTorque * 5;
+        }
 
         float angle = axis.x * _rotateSpeed;
         _frontLeftWheel.steerAngle = angle;
