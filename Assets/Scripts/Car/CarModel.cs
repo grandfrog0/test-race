@@ -20,6 +20,14 @@ public class CarModel : MonoBehaviour
         _trailParticles = new();
         foreach (WheelCollider c in new List<WheelCollider>() { WheelBL, WheelBR, WheelFL, WheelFR })
         {
+            c.sidewaysFriction = new WheelFrictionCurve()
+            {
+                stiffness = 5.5f,
+                asymptoteSlip = c.sidewaysFriction.asymptoteSlip,
+                asymptoteValue = c.sidewaysFriction.asymptoteValue,
+                extremumSlip = c.sidewaysFriction.extremumSlip,
+                extremumValue = c.sidewaysFriction.extremumValue
+            };
             _smokeParticles.Add(Instantiate(_smokePrefab, c.transform.position, c.transform.rotation, c.transform));
             _trailParticles.Add(Instantiate(_trailPrefab, c.transform.position - c.transform.localScale / 2, Quaternion.identity, transform));
         }

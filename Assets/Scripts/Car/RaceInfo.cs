@@ -39,7 +39,7 @@ public class RaceInfo : MonoBehaviour
     /// <summary>
     /// Количество заработанных звёзд
     /// </summary>
-    public int StarsCount => Mathf.Clamp((int)Score / 250/*1000*/, 0, 3);
+    public int StarsCount => Mathf.Clamp((int)Score / 125/*250*/, 0, 3);
     /// <summary>
     /// Текущее время забега
     /// </summary>
@@ -67,8 +67,7 @@ public class RaceInfo : MonoBehaviour
     /// </summary>
     public void OnCycleFinished()
     {
-        Cycles++;
-        if (Cycles >= 3)
+        if (++Cycles == 3)
             Finish();
     }
 

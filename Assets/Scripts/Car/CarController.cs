@@ -11,6 +11,7 @@ public class CarController : MonoBehaviour
     [SerializeField] Rigidbody _rigidbody;
     [SerializeField] GroundChecker _groundChecker;
     [SerializeField] float _rotateSpeed, _brakeStrength, _maxDeflection, _nitroStrength;
+    [SerializeField] float _speedMultiplier = 2f;
 
     [SerializeField] CarModel _carModel;
     private WheelCollider _frontLeftWheel, _frontRightWheel;
@@ -39,9 +40,8 @@ public class CarController : MonoBehaviour
     private float _startMass;
     private bool _isHandBroken;
     private bool _isTorqueReleased = true;
-    private Vector2 _axis;
 
-    // настройка передач и оборотов
+    // Настройка передач и оборотов
     private CarTransmission _transmission;
     private float _maxMotorTorque = 1500;
     private float _maxRPM = 7000f;
@@ -49,13 +49,16 @@ public class CarController : MonoBehaviour
     private float _currentMotorTorque;
     private float _engineRPM;
     private float _gearRatio = 1f;
+    private Vector2 _axis;
     public float GearRatio
     {
         get => _gearRatio;
-        set => _gearRatio = Mathf.Max(value, 0.1f);
+        set => _gearRatio = value;
     }
     public float EngineRPM => _engineRPM;
     public bool IsStalled { get; set; } // заглох ли автомобиль
+    public float MaxRPM { get => _maxRPM; set => _maxRPM = value; }
+    public float MinRPM { get => _minRPM; set => _minRPM = value; }
 
     private void Start()
     {
@@ -104,44 +107,60 @@ public class CarController : MonoBehaviour
         {
             if (!IsStalled)
             {
-                if (_engineRPM < 1000 && _currentMotorTorque > 0 && !(DriftAngle > 90 && _rigidbody.velocity.magnitude > 1))
+                if ((_engineRPM <= MinRPM && _currentMotorTorque > 0) || (DriftAngle > 90 || _rigidbody.velocity.magnitude > 1))
+                {
                     IsStalled = true;
+                }
             }
             else
             {
-                if (_transmission.IsClutchPressed && axis.y != 0)
+                if (_transmission.IsClutchPressed && axis.y > 0)
                 {
                     IsStalled = false;
                 }
             }
         }
 
+        float targetRPM;
         if (_transmission.IsAutomatic)
-            IsStalled = false;
-
-        float targetRPM = axis.y > 0 ?
-            _minRPM + axis.y * (_maxRPM - _minRPM) : 
-            _minRPM;
-        _engineRPM = Mathf.Lerp(_engineRPM, targetRPM, Time.deltaTime * 0.5f);
-        _engineRPM = Mathf.Clamp(_engineRPM, _minRPM, _maxRPM);
-
-        _currentMotorTorque = axis.y * _maxMotorTorque / _gearRatio;
-
-        if (!_isHandBroken && !IsStalled && _transmission.CurrentGear != 0)
         {
-            _frontLeftWheel.motorTorque = _currentMotorTorque * 5;
-            _frontRightWheel.motorTorque = _currentMotorTorque * 5;
-            _backLeftWheel.motorTorque = _currentMotorTorque * 5;
-            _backRightWheel.motorTorque = _currentMotorTorque * 5;
+            IsStalled = false;
+            targetRPM = axis.y > 0 ? _minRPM + axis.y * (_maxRPM - _minRPM) : 0;
+        }
+        else
+        {
+           targetRPM = axis.y > 0 ? _minRPM + axis.y * (_maxRPM - _minRPM) : 0;
         }
 
-        float angle = axis.x * _rotateSpeed;
+        _engineRPM = Mathf.Lerp(_engineRPM, targetRPM, Time.deltaTime * 0.5f);
+
+        _currentMotorTorque =
+            _gearRatio == 0 ?
+            Mathf.Lerp(_currentMotorTorque, 0, Time.deltaTime) :
+            axis.y * _maxMotorTorque / _gearRatio;
+
+        if (!_transmission.IsClutchPressed && !_isHandBroken && !IsStalled && _transmission.CurrentGear != 0)
+        {
+            _frontLeftWheel.motorTorque = _currentMotorTorque * _speedMultiplier;
+            _frontRightWheel.motorTorque = _currentMotorTorque * _speedMultiplier;
+            _backLeftWheel.motorTorque = _currentMotorTorque * _speedMultiplier;
+            _backRightWheel.motorTorque = _currentMotorTorque * _speedMultiplier;
+        }
+        else
+        {
+            _frontLeftWheel.motorTorque = Mathf.Lerp(_frontLeftWheel.motorTorque, 0, Time.deltaTime);
+            _frontRightWheel.motorTorque = Mathf.Lerp(_frontRightWheel.motorTorque, 0, Time.deltaTime);
+            _backLeftWheel.motorTorque = Mathf.Lerp(_backLeftWheel.motorTorque, 0, Time.deltaTime);
+            _backRightWheel.motorTorque = Mathf.Lerp(_backRightWheel.motorTorque, 0, Time.deltaTime);
+        }
+
+            float angle = axis.x * _rotateSpeed;
         _frontLeftWheel.steerAngle = angle;
         _frontRightWheel.steerAngle = angle;
 
         _carModel.SetReverseLightsActive(DriftAngle > 90 && _rigidbody.velocity.magnitude > 1);
         _carModel.SetStopLightsActive(axis.y < 0 && !(DriftAngle > 90 && _rigidbody.velocity.magnitude > 1));
-        
+
         _axis = axis;
     }
     /// <summary>

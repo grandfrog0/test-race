@@ -12,8 +12,10 @@ public class CarTransmission : MonoBehaviour
     private float _reverseGearRatio = -3.0f;
     private float _finalDriveRatio = 3.5f;
 
-    private float[] _shiftUpRPM = { 3000, 3500, 4000, 4500, 5000 };
-    private float[] _shiftDownRPM = { 1500, 2000, 2500, 3000, 3500 };
+    private float[] _shiftUpRPM = { 3000, 3500, 4000, 4500, 5000, 5500 };
+    private float[] _shiftDownRPM = { 1500, 2000, 2500, 3000, 3500, 4000 };
+    private float _reverseShiftUp = 3500;
+    private float _reverseShiftDown = 2000;
     private float _shiftDelay = 0.5f;
 
     private int _currentGear = 1;
@@ -47,7 +49,7 @@ public class CarTransmission : MonoBehaviour
 
             // Повышение передачи
             if (_currentGear > 0 && _currentGear < _gearRatios.Length &&
-                _controller.EngineRPM > _shiftUpRPM[_currentGear - 1])
+                _controller.EngineRPM >= _shiftUpRPM[_currentGear - 1] - 10)
             {
                 ShiftUp();
             }
@@ -108,17 +110,25 @@ public class CarTransmission : MonoBehaviour
         if (_controller == null) return;
 
         float gearRatio = 0f;
+        float minRPM = 0f;
+        float maxRPM = 0f;
 
         if (_currentGear == -1)
         {
             gearRatio = _reverseGearRatio * _finalDriveRatio;
+            minRPM = _reverseShiftDown;
+            maxRPM = _reverseShiftUp;
         }
         else if (_currentGear > 0 && _currentGear <= _gearRatios.Length)
         {
             gearRatio = _gearRatios[_currentGear - 1] * _finalDriveRatio;
+            minRPM = _shiftDownRPM[_currentGear - 1];
+            maxRPM = _shiftUpRPM[_currentGear - 1];
         }
 
         _controller.GearRatio = gearRatio;
+        _controller.MinRPM = minRPM;
+        _controller.MaxRPM = maxRPM;
     }
 
     public void ToggleTransmission()

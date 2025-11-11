@@ -33,7 +33,7 @@ public class GroundChecker : MonoBehaviour
             {
                 transform.position = _lastPos;
                 transform.rotation = Quaternion.Euler(0, _lastAngle, 0);
-                _rigidbody.velocity = Vector3.zero;
+                _rigidbody.velocity = new Vector3(0, _rigidbody.velocity.y, 0);
             }
         }
     }
