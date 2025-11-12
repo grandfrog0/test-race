@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -44,8 +45,8 @@ public class CarController : MonoBehaviour
     // Настройка передач и оборотов
     private CarTransmission _transmission;
     private float _maxMotorTorque = 1500;
-    private float _maxRPM = 7000f;
-    private float _minRPM = 500f;
+    //private float _maxRPM = 7000f;
+    //private float _minRPM = 500f;
     private float _currentMotorTorque;
     private float _engineRPM;
     private float _gearRatio = 1f;
@@ -55,10 +56,11 @@ public class CarController : MonoBehaviour
         get => _gearRatio;
         set => _gearRatio = value;
     }
-    public float EngineRPM => _engineRPM;
+    public float EngineRPM { get => _engineRPM; set => _engineRPM = value; }
     public bool IsStalled { get; set; } // заглох ли автомобиль
-    public float MaxRPM { get => _maxRPM; set => _maxRPM = value; }
-    public float MinRPM { get => _minRPM; set => _minRPM = value; }
+    private bool _isRPMDown = false;
+    public bool IsGearSwitching { get => _isGearSwitching; set => _isGearSwitching = value; }
+    private bool _isGearSwitching;
 
     private void Start()
     {
@@ -107,39 +109,42 @@ public class CarController : MonoBehaviour
         {
             if (!IsStalled)
             {
-                if ((_engineRPM <= MinRPM && _currentMotorTorque > 0) || (DriftAngle > 90 || _rigidbody.velocity.magnitude > 1))
+                if (!_isRPMDown && _engineRPM <= 1000)
                 {
+                    _isRPMDown = true;
                     IsStalled = true;
                 }
             }
             else
             {
+                if (_engineRPM > 1000)
+                {
+                    _isRPMDown = true;
+                    IsStalled = true;
+                }
                 if (_transmission.IsClutchPressed && axis.y > 0)
                 {
                     IsStalled = false;
                 }
             }
+
         }
 
-        float targetRPM;
         if (_transmission.IsAutomatic)
         {
             IsStalled = false;
-            targetRPM = axis.y > 0 ? _minRPM + axis.y * (_maxRPM - _minRPM) : 0;
-        }
-        else
-        {
-           targetRPM = axis.y > 0 ? _minRPM + axis.y * (_maxRPM - _minRPM) : 0;
+            _transmission.CurrentGear = Mathf.Max(_transmission.CurrentGear, 1);
         }
 
-        _engineRPM = Mathf.Lerp(_engineRPM, targetRPM, Time.deltaTime * 0.5f);
+        if (!_isGearSwitching)
+            _engineRPM = Mathf.Lerp(_engineRPM, IsStalled || axis.y == 0 ? 0 : _isGearSwitching ? 1500 : 3000, Time.deltaTime * 0.5f);
 
-        _currentMotorTorque =
-            _gearRatio == 0 ?
-            Mathf.Lerp(_currentMotorTorque, 0, Time.deltaTime) :
-            axis.y * _maxMotorTorque / _gearRatio;
+        if (_transmission.IsAutomatic && _transmission.CurrentGear == 1)
+            _engineRPM = Mathf.Max(_engineRPM, 1000);
 
-        if (!_transmission.IsClutchPressed && !_isHandBroken && !IsStalled && _transmission.CurrentGear != 0)
+        _currentMotorTorque = axis.y * _engineRPM / _gearRatio;
+
+        if (axis.y != 0 && !_transmission.IsClutchPressed && !_isHandBroken && !IsStalled && _transmission.CurrentGear != 0)
         {
             _frontLeftWheel.motorTorque = _currentMotorTorque * _speedMultiplier;
             _frontRightWheel.motorTorque = _currentMotorTorque * _speedMultiplier;
@@ -148,13 +153,18 @@ public class CarController : MonoBehaviour
         }
         else
         {
-            _frontLeftWheel.motorTorque = Mathf.Lerp(_frontLeftWheel.motorTorque, 0, Time.deltaTime);
-            _frontRightWheel.motorTorque = Mathf.Lerp(_frontRightWheel.motorTorque, 0, Time.deltaTime);
-            _backLeftWheel.motorTorque = Mathf.Lerp(_backLeftWheel.motorTorque, 0, Time.deltaTime);
-            _backRightWheel.motorTorque = Mathf.Lerp(_backRightWheel.motorTorque, 0, Time.deltaTime);
+            _frontLeftWheel.motorTorque = Mathf.Lerp(_frontLeftWheel.motorTorque, 0, Time.deltaTime * 5);
+            _frontRightWheel.motorTorque = Mathf.Lerp(_frontRightWheel.motorTorque, 0, Time.deltaTime * 5);
+            _backLeftWheel.motorTorque = Mathf.Lerp(_backLeftWheel.motorTorque, 0, Time.deltaTime * 5);
+            _backRightWheel.motorTorque = Mathf.Lerp(_backRightWheel.motorTorque, 0, Time.deltaTime * 5);
+
+            _frontLeftWheel.rotationSpeed = Mathf.Lerp(_frontLeftWheel.motorTorque, 0, Time.deltaTime * 5);
+            _frontRightWheel.rotationSpeed = Mathf.Lerp(_frontRightWheel.motorTorque, 0, Time.deltaTime * 5);
+            _backLeftWheel.rotationSpeed = Mathf.Lerp(_backLeftWheel.motorTorque, 0, Time.deltaTime * 5);
+            _backRightWheel.rotationSpeed = Mathf.Lerp(_backRightWheel.motorTorque, 0, Time.deltaTime * 5);
         }
 
-            float angle = axis.x * _rotateSpeed;
+        float angle = axis.x * _rotateSpeed;
         _frontLeftWheel.steerAngle = angle;
         _frontRightWheel.steerAngle = angle;
 

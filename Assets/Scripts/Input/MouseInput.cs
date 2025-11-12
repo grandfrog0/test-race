@@ -11,7 +11,6 @@ public class MouseInput : MonoBehaviour
     [SerializeField] CarController _carController;
     [SerializeField] PauseButton _pauseButton;
     private CarTransmission _carTransmission;
-    private float _lastMouse0PressedTime;
 
     private float _mouseDelta => Input.GetAxis("Mouse X");
 
@@ -26,7 +25,7 @@ public class MouseInput : MonoBehaviour
             if (Input.GetMouseButtonUp(ToInt(Input.GetMouseButton(1))))
                 _carController.ReleaseTorque();
         }
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Input.GetKeyDown(KeyCode.F))
         {
             _carTransmission.ToggleTransmission();
         } 

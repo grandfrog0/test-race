@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class CarTransmission : MonoBehaviour
 {
@@ -12,8 +13,8 @@ public class CarTransmission : MonoBehaviour
     private float _reverseGearRatio = -3.0f;
     private float _finalDriveRatio = 3.5f;
 
-    private float[] _shiftUpRPM = { 3000, 3500, 4000, 4500, 5000, 5500 };
-    private float[] _shiftDownRPM = { 1500, 2000, 2500, 3000, 3500, 4000 };
+    //private float[] _shiftUpRPM = { 3000, 3500, 4000, 4500, 5000, 5500 };
+    //private float[] _shiftDownRPM = { 1500, 2000, 2500, 3000, 3500, 4000 };
     private float _reverseShiftUp = 3500;
     private float _reverseShiftDown = 2000;
     private float _shiftDelay = 0.5f;
@@ -41,7 +42,7 @@ public class CarTransmission : MonoBehaviour
     {
         while (true)
         {
-            if (Time.time - _lastShiftTime < _shiftDelay)
+            if (_controller.IsGearSwitching)
             {
                 yield return new WaitForSeconds(0.1f);
                 continue;
@@ -49,12 +50,12 @@ public class CarTransmission : MonoBehaviour
 
             // Повышение передачи
             if (_currentGear > 0 && _currentGear < _gearRatios.Length &&
-                _controller.EngineRPM >= _shiftUpRPM[_currentGear - 1] - 10)
+                _controller.EngineRPM >= 2750)
             {
                 ShiftUp();
             }
             // Понижение передачи
-            else if (_currentGear > 1 && _controller.EngineRPM < _shiftDownRPM[_currentGear - 2])
+            else if (_currentGear > 1 && _controller.EngineRPM < 1250)
             {
                 ShiftDown();
             }
@@ -82,7 +83,7 @@ public class CarTransmission : MonoBehaviour
     {
         if (_currentGear < _gearRatios.Length)
         {
-            PerformShift(_currentGear + 1);
+            StartCoroutine(PerformShift(_currentGear + 1));
         }
     }
 
@@ -90,13 +91,25 @@ public class CarTransmission : MonoBehaviour
     {
         if (_currentGear > -1)
         {
-            PerformShift(_currentGear - 1);
+            StartCoroutine(PerformShift(_currentGear - 1));
         }
     }
 
-    private void PerformShift(int targetGear)
+    private IEnumerator PerformShift(int targetGear)
     {
         _lastShiftTime = Time.time;
+
+        _controller.IsGearSwitching = true;
+        int value = targetGear > _currentGear ? 1500 : 2500;
+
+        for (float t = 0; t <= 1; t += Time.deltaTime * 10)
+        {
+            _controller.EngineRPM = Mathf.Lerp(_controller.EngineRPM, value, t);
+            yield return null;
+        }
+
+        _currentGear = targetGear;
+        _controller.IsGearSwitching = false;
 
         _currentGear = targetGear;
 
@@ -104,31 +117,30 @@ public class CarTransmission : MonoBehaviour
 
         Debug.Log($"Переключение на передачу: {targetGear}");
     }
-
     private void ApplyGearRatio()
     {
         if (_controller == null) return;
 
         float gearRatio = 0f;
-        float minRPM = 0f;
-        float maxRPM = 0f;
+        //float minRPM = 0f;
+        //float maxRPM = 0f;
 
         if (_currentGear == -1)
         {
             gearRatio = _reverseGearRatio * _finalDriveRatio;
-            minRPM = _reverseShiftDown;
-            maxRPM = _reverseShiftUp;
+            //minRPM = _reverseShiftDown;
+            //maxRPM = _reverseShiftUp;
         }
         else if (_currentGear > 0 && _currentGear <= _gearRatios.Length)
         {
             gearRatio = _gearRatios[_currentGear - 1] * _finalDriveRatio;
-            minRPM = _shiftDownRPM[_currentGear - 1];
-            maxRPM = _shiftUpRPM[_currentGear - 1];
+            //minRPM = _shiftDownRPM[_currentGear - 1];
+            //maxRPM = _shiftUpRPM[_currentGear - 1];
         }
 
         _controller.GearRatio = gearRatio;
-        _controller.MinRPM = minRPM;
-        _controller.MaxRPM = maxRPM;
+        //_controller.MinRPM = minRPM;
+        //_controller.MaxRPM = maxRPM;
     }
 
     public void ToggleTransmission()
