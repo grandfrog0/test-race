@@ -13,6 +13,13 @@ public class CarTransmission : MonoBehaviour
     private float _reverseGearRatio = -3.0f;
     private float _finalDriveRatio = 3.5f;
 
+    private float[] _minSpeeds = { 0, 0, 20, 40, 60, 90, 120 };
+    private float[] _maxSpeeds = { 0, 20, 40, 60, 90, 120, 150 };
+    private float[] _koefRPM = { 0, 1 / 150f, 1 / 75f, 1 / 50f, 1 / 33f, 1 / 25f, 1 };
+    public float MinSpeed => _minSpeeds[Mathf.Abs(CurrentGear)];
+    public float MaxSpeed => _maxSpeeds[Mathf.Abs(CurrentGear)];
+    public float KoefRPM => _koefRPM[Mathf.Abs(CurrentGear)] * CurrentGear == -1 ? -1 : 1;
+
     //private float[] _shiftUpRPM = { 3000, 3500, 4000, 4500, 5000, 5500 };
     //private float[] _shiftDownRPM = { 1500, 2000, 2500, 3000, 3500, 4000 };
     private float _reverseShiftUp = 3500;
@@ -111,7 +118,7 @@ public class CarTransmission : MonoBehaviour
         _currentGear = targetGear;
         _controller.IsGearSwitching = false;
 
-        _currentGear = targetGear;
+        _controller.MaxRPM = !IsAutomatic || _currentGear == 6 ? 7000 : 3000;
 
         ApplyGearRatio();
 
@@ -122,25 +129,23 @@ public class CarTransmission : MonoBehaviour
         if (_controller == null) return;
 
         float gearRatio = 0f;
-        //float minRPM = 0f;
-        //float maxRPM = 0f;
+        float minSpeed = 0f;
+        float maxSpeed = 0f;
 
         if (_currentGear == -1)
         {
             gearRatio = _reverseGearRatio * _finalDriveRatio;
-            //minRPM = _reverseShiftDown;
-            //maxRPM = _reverseShiftUp;
+            minSpeed = -_minSpeeds[0];
+            maxSpeed = -_maxSpeeds[0];
         }
         else if (_currentGear > 0 && _currentGear <= _gearRatios.Length)
         {
             gearRatio = _gearRatios[_currentGear - 1] * _finalDriveRatio;
-            //minRPM = _shiftDownRPM[_currentGear - 1];
-            //maxRPM = _shiftUpRPM[_currentGear - 1];
+            minSpeed = _minSpeeds[_currentGear - 1];
+            maxSpeed = _maxSpeeds[_currentGear - 1];
         }
 
         _controller.GearRatio = gearRatio;
-        //_controller.MinRPM = minRPM;
-        //_controller.MaxRPM = maxRPM;
     }
 
     public void ToggleTransmission()

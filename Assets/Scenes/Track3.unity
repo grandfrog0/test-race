@@ -2230,7 +2230,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _arrow: {fileID: 602229314}
   _minMaxAngle: {x: 180, y: -90}
-  _maxSpeed: 10000
+  _maxSpeed: 9000
 --- !u!1 &563487129 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c79630368fce7a34e8728b68e0df74fc, type: 3}

@@ -58,9 +58,10 @@ public class CarController : MonoBehaviour
     }
     public float EngineRPM { get => _engineRPM; set => _engineRPM = value; }
     public bool IsStalled { get; set; } // заглох ли автомобиль
-    private bool _isRPMDown = false;
     public bool IsGearSwitching { get => _isGearSwitching; set => _isGearSwitching = value; }
     private bool _isGearSwitching;
+    public float MaxRPM { get; set; } = 3000;
+    public float MinRPM { get; set; } = 1000;
 
     private void Start()
     {
@@ -105,33 +106,24 @@ public class CarController : MonoBehaviour
     /// <param name="axis"></param>
     public void SetAxis(Vector2 axis)
     {
-        Debug.Log(IsStalled);
         if (_isTorqueReleased && !_transmission.IsAutomatic)
         {
             if (!IsStalled)
             {
-                Debug.Log(!_isRPMDown + "; " + (_engineRPM <= 1000));
-                if (!_isRPMDown && _engineRPM <= 1000)
+                if (_engineRPM <= 1000)
                 {
-                    _isRPMDown = true;
                     IsStalled = true;
                 }
             }
             else
             {
-                if (_engineRPM > 1000)
-                {
-                    _isRPMDown = true;
-                    IsStalled = true;
-                }
-                if (_transmission.IsClutchPressed && _transmission.CurrentGear < 3 && axis.y > 0)
+                Debug.Log($"{_transmission.IsClutchPressed} && {_currentMotorTorque} >= {_transmission.MinSpeed} && {axis.y > 0}");
+                if (_transmission.IsClutchPressed && _currentMotorTorque >= _transmission.MinSpeed && axis.y > 0)
                 {
                     IsStalled = false;
                 }
             }
-
         }
-
         if (_transmission.IsAutomatic)
         {
             IsStalled = false;
@@ -139,12 +131,13 @@ public class CarController : MonoBehaviour
         }
 
         if (!_isGearSwitching)
-            _engineRPM = Mathf.Lerp(_engineRPM, IsStalled || axis.y == 0 ? 0 : _isGearSwitching ? 1500 : 3000, Time.deltaTime * 0.5f);
+            _engineRPM = Mathf.Lerp(_engineRPM, IsStalled || axis.y <= 0 ? 0 : _isGearSwitching ? 1500 : MaxRPM, Time.deltaTime);
 
         if (_transmission.IsAutomatic && _transmission.CurrentGear == 1)
             _engineRPM = Mathf.Max(_engineRPM, 1000);
 
-        _currentMotorTorque = axis.y * _engineRPM / _gearRatio;
+        _currentMotorTorque = !IsStalled ? Mathf.Max(0, axis.y) * _engineRPM * (_currentMotorTorque > _transmission.MaxSpeed ? _transmission.KoefRPM : 1) : 0;
+        
 
         if (axis.y != 0 && !_transmission.IsClutchPressed && !_isHandBroken && !IsStalled && _transmission.CurrentGear != 0)
         {
@@ -160,10 +153,10 @@ public class CarController : MonoBehaviour
             _backLeftWheel.motorTorque = Mathf.Lerp(_backLeftWheel.motorTorque, 0, Time.deltaTime * 5);
             _backRightWheel.motorTorque = Mathf.Lerp(_backRightWheel.motorTorque, 0, Time.deltaTime * 5);
 
-            _frontLeftWheel.rotationSpeed = Mathf.Lerp(_frontLeftWheel.motorTorque, 0, Time.deltaTime * 5);
-            _frontRightWheel.rotationSpeed = Mathf.Lerp(_frontRightWheel.motorTorque, 0, Time.deltaTime * 5);
-            _backLeftWheel.rotationSpeed = Mathf.Lerp(_backLeftWheel.motorTorque, 0, Time.deltaTime * 5);
-            _backRightWheel.rotationSpeed = Mathf.Lerp(_backRightWheel.motorTorque, 0, Time.deltaTime * 5);
+            _frontLeftWheel.rotationSpeed = Mathf.Lerp(_frontLeftWheel.motorTorque, 0, Time.deltaTime * Mathf.Max(1, _transmission.CurrentGear));
+            _frontRightWheel.rotationSpeed = Mathf.Lerp(_frontRightWheel.motorTorque, 0, Time.deltaTime * Mathf.Max(1, _transmission.CurrentGear));
+            _backLeftWheel.rotationSpeed = Mathf.Lerp(_backLeftWheel.motorTorque, 0, Time.deltaTime * Mathf.Max(1, _transmission.CurrentGear));
+            _backRightWheel.rotationSpeed = Mathf.Lerp(_backRightWheel.motorTorque, 0, Time.deltaTime * Mathf.Max(1, _transmission.CurrentGear));
         }
 
         float angle = axis.x * _rotateSpeed;
