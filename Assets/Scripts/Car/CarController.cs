@@ -105,10 +105,12 @@ public class CarController : MonoBehaviour
     /// <param name="axis"></param>
     public void SetAxis(Vector2 axis)
     {
+        Debug.Log(IsStalled);
         if (_isTorqueReleased && !_transmission.IsAutomatic)
         {
             if (!IsStalled)
             {
+                Debug.Log(!_isRPMDown + "; " + (_engineRPM <= 1000));
                 if (!_isRPMDown && _engineRPM <= 1000)
                 {
                     _isRPMDown = true;
@@ -122,7 +124,7 @@ public class CarController : MonoBehaviour
                     _isRPMDown = true;
                     IsStalled = true;
                 }
-                if (_transmission.IsClutchPressed && axis.y > 0)
+                if (_transmission.IsClutchPressed && _transmission.CurrentGear < 3 && axis.y > 0)
                 {
                     IsStalled = false;
                 }
