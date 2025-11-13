@@ -18,10 +18,8 @@ public class CarTransmission : MonoBehaviour
     private float[] _koefRPM = { 0, 1 / 150f, 1 / 75f, 1 / 50f, 1 / 33f, 1 / 25f, 1 };
     public float MinSpeed => _minSpeeds[Mathf.Abs(CurrentGear)];
     public float MaxSpeed => _maxSpeeds[Mathf.Abs(CurrentGear)];
-    public float KoefRPM => _koefRPM[Mathf.Abs(CurrentGear)] * CurrentGear == -1 ? -1 : 1;
+    public float KoefRPM => _koefRPM[Mathf.Abs(CurrentGear)];
 
-    //private float[] _shiftUpRPM = { 3000, 3500, 4000, 4500, 5000, 5500 };
-    //private float[] _shiftDownRPM = { 1500, 2000, 2500, 3000, 3500, 4000 };
     private float _reverseShiftUp = 3500;
     private float _reverseShiftDown = 2000;
     private float _shiftDelay = 0.5f;
@@ -31,18 +29,12 @@ public class CarTransmission : MonoBehaviour
     public bool IsClutchPressed { get; set; } = false;
 
     private CarController _controller;
-    private CarModel _model;
-    private List<WheelCollider> _wheelColliders;
-    private float _lastShiftTime;
-    private Coroutine _coroutine;
+    private Coroutine _transmissionRoutine;
 
     void Start()
     {
         _controller = GetComponent<CarController>();
-        _model = _controller.Model;
-        _wheelColliders = new(){ _model.WheelFR, _model.WheelFL, _model.WheelBL, _model.WheelBR };
-
-        _coroutine = StartCoroutine(HandleAutomaticTransmission());
+        _transmissionRoutine = StartCoroutine(HandleAutomaticTransmission());
     }
 
     private IEnumerator HandleAutomaticTransmission()
@@ -102,12 +94,21 @@ public class CarTransmission : MonoBehaviour
         }
     }
 
+    public void ShiftTo(int targetGear)
+        => StartCoroutine(PerformShift(targetGear));
+
     private IEnumerator PerformShift(int targetGear)
     {
-        _lastShiftTime = Time.time;
-
         _controller.IsGearSwitching = true;
-        int value = targetGear > _currentGear ? 1500 : 2500;
+
+        int value;
+
+        if (targetGear == -1)
+            value = 1000;
+        else if (targetGear > _currentGear)
+            value = 1500;
+        else
+            value = 2500;
 
         for (float t = 0; t <= 1; t += Time.deltaTime * 10)
         {
@@ -118,7 +119,7 @@ public class CarTransmission : MonoBehaviour
         _currentGear = targetGear;
         _controller.IsGearSwitching = false;
 
-        _controller.MaxRPM = !IsAutomatic || _currentGear == 6 ? 7000 : 3000;
+        _controller.MaxRPM = !IsAutomatic || _currentGear == 6 ? 9000 : 3000;
 
         ApplyGearRatio();
 
@@ -152,13 +153,13 @@ public class CarTransmission : MonoBehaviour
     {
         _isAutomatic = !_isAutomatic;
 
-        if (!_coroutine.IsUnityNull())
+        if (!_transmissionRoutine.IsUnityNull())
         {
-            StopCoroutine(_coroutine);
+            StopCoroutine(_transmissionRoutine);
         }
         if (_isAutomatic)
         {
-            _coroutine = StartCoroutine(HandleAutomaticTransmission());
+            _transmissionRoutine = StartCoroutine(HandleAutomaticTransmission());
         }
 
         Debug.Log("Режим: " + (_isAutomatic ? "Автомат" : "Ручной"));

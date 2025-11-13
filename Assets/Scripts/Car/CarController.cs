@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// Скрипт управления автомобилем
@@ -63,6 +64,9 @@ public class CarController : MonoBehaviour
     public float MaxRPM { get; set; } = 3000;
     public float MinRPM { get; set; } = 1000;
 
+    public bool IsStopping => _axis.y < 0 && !IsReverseDriving;
+    public bool IsReverseDriving => DriftAngle > 90 && _rigidbody.velocity.magnitude > 1;
+
     private void Start()
     {
         _transmission = GetComponent<CarTransmission>();
@@ -106,6 +110,8 @@ public class CarController : MonoBehaviour
     /// <param name="axis"></param>
     public void SetAxis(Vector2 axis)
     {
+        _axis = axis;
+
         if (_isTorqueReleased && !_transmission.IsAutomatic)
         {
             if (!IsStalled)
@@ -117,7 +123,6 @@ public class CarController : MonoBehaviour
             }
             else
             {
-                Debug.Log($"{_transmission.IsClutchPressed} && {_currentMotorTorque} >= {_transmission.MinSpeed} && {axis.y > 0}");
                 if (_transmission.IsClutchPressed && _currentMotorTorque >= _transmission.MinSpeed && axis.y > 0)
                 {
                     IsStalled = false;
@@ -127,16 +132,38 @@ public class CarController : MonoBehaviour
         if (_transmission.IsAutomatic)
         {
             IsStalled = false;
-            _transmission.CurrentGear = Mathf.Max(_transmission.CurrentGear, 1);
+            if (_transmission.CurrentGear == 0)
+                _transmission.CurrentGear = 1;
+            if (!_isGearSwitching)
+            {
+                Debug.Log($"{IsReverseDriving} && {_transmission.CurrentGear != -1}");
+                if (IsReverseDriving && _transmission.CurrentGear != -1)
+                {
+                    _transmission.ShiftTo(-1);
+                }
+                else if (!IsReverseDriving && _transmission.CurrentGear == -1)
+                {
+                    _transmission.ShiftTo(1);
+                }
+            }
         }
 
         if (!_isGearSwitching)
-            _engineRPM = Mathf.Lerp(_engineRPM, IsStalled || axis.y <= 0 ? 0 : _isGearSwitching ? 1500 : MaxRPM, Time.deltaTime);
+        {
+            if (_transmission.IsAutomatic)
+                _engineRPM = Mathf.Lerp(_engineRPM, IsStalled || axis.y == 0 || IsStopping ? 0 : MaxRPM, 3000 / MaxRPM * Time.deltaTime);
+            else
+                _engineRPM = Mathf.Lerp(_engineRPM, IsStalled || axis.y <= 0 ? 0 : MaxRPM, Time.deltaTime);
+        }
 
         if (_transmission.IsAutomatic && _transmission.CurrentGear == 1)
             _engineRPM = Mathf.Max(_engineRPM, 1000);
 
-        _currentMotorTorque = !IsStalled ? Mathf.Max(0, axis.y) * _engineRPM * (_currentMotorTorque > _transmission.MaxSpeed ? _transmission.KoefRPM : 1) : 0;
+        int reverseKoef = _transmission.CurrentGear == -1 ? -1 : 1;
+        if (_transmission.IsAutomatic)
+            _currentMotorTorque = !IsStalled ? axis.y * _engineRPM * (_currentMotorTorque > _transmission.MaxSpeed ? _transmission.KoefRPM : 1) : 0;
+        else
+            _currentMotorTorque = !IsStalled ? Mathf.Max(0, axis.y) * _engineRPM * (_currentMotorTorque > _transmission.MaxSpeed ? _transmission.KoefRPM : 1) * reverseKoef : 0;
         
 
         if (axis.y != 0 && !_transmission.IsClutchPressed && !_isHandBroken && !IsStalled && _transmission.CurrentGear != 0)
@@ -163,10 +190,9 @@ public class CarController : MonoBehaviour
         _frontLeftWheel.steerAngle = angle;
         _frontRightWheel.steerAngle = angle;
 
-        _carModel.SetReverseLightsActive(DriftAngle > 90 && _rigidbody.velocity.magnitude > 1);
-        _carModel.SetStopLightsActive(axis.y < 0 && !(DriftAngle > 90 && _rigidbody.velocity.magnitude > 1));
+        _carModel.SetReverseLightsActive(IsReverseDriving);
+        _carModel.SetStopLightsActive(IsStopping);
 
-        _axis = axis;
     }
     /// <summary>
     /// Тормозить

@@ -9,7 +9,7 @@ public class GroundChecker : MonoBehaviour
 {
     [SerializeField] Vector3 _carOffset;
     [SerializeField] LayerMask _groundMask;
-    private float _lastAngle;
+    private Quaternion _lastAngle;
     private Vector3 _lastPos;
     private float _outsideTime;
     private Rigidbody _rigidbody;
@@ -22,7 +22,7 @@ public class GroundChecker : MonoBehaviour
 
         if ((IsOnGround = Physics.Raycast(ray, 3, _groundMask)))
         {
-            _lastAngle = transform.eulerAngles.y;
+            _lastAngle = transform.rotation;
             _lastPos = transform.position;
             _outsideTime = 0;
         }
@@ -32,7 +32,7 @@ public class GroundChecker : MonoBehaviour
             if (_outsideTime >= 10)
             {
                 transform.position = _lastPos;
-                transform.rotation = Quaternion.Euler(0, _lastAngle, 0);
+                transform.rotation = _lastAngle;
                 _rigidbody.velocity = new Vector3(0, _rigidbody.velocity.y, 0);
             }
         }
