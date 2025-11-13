@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro.EditorUtilities;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
@@ -15,9 +16,11 @@ public class CarTransmission : MonoBehaviour
 
     private float[] _minSpeeds = { 0, 0, 20, 40, 60, 90, 120 };
     private float[] _maxSpeeds = { 0, 20, 40, 60, 90, 120, 150 };
+    private float[] _borderSpeeds = { 0, 40, 60, 80, 120, 150, 180 };
     private float[] _koefRPM = { 0, 1 / 150f, 1 / 75f, 1 / 50f, 1 / 33f, 1 / 25f, 1 };
     public float MinSpeed => _minSpeeds[Mathf.Abs(CurrentGear)];
     public float MaxSpeed => _maxSpeeds[Mathf.Abs(CurrentGear)];
+    public float BorderSpeed => _borderSpeeds[Mathf.Abs(CurrentGear)];
     public float KoefRPM => _koefRPM[Mathf.Abs(CurrentGear)];
 
     private float _reverseShiftUp = 3500;
@@ -101,14 +104,14 @@ public class CarTransmission : MonoBehaviour
     {
         _controller.IsGearSwitching = true;
 
-        int value;
+        float value;
 
         if (targetGear == -1)
             value = 1000;
         else if (targetGear > _currentGear)
-            value = 1500;
+            value = Mathf.Max(_controller.EngineRPM - 1000, 0);
         else
-            value = 2500;
+            value = Mathf.Min(_controller.EngineRPM + 1000, _controller.MaxRPM);
 
         for (float t = 0; t <= 1; t += Time.deltaTime * 10)
         {

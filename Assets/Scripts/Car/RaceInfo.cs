@@ -56,7 +56,7 @@ public class RaceInfo : MonoBehaviour
 
     [SerializeField] CarController _car;
     private CarTransmission _carTransmission;
-    private Vector2 _oldVelocity;
+    private float _oldTorque;
     private float _oldRevolutions;
     private int _oldGear;
     private float _nitro;
@@ -96,11 +96,11 @@ public class RaceInfo : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector2 velocity = _car.Velocity;
-        if (_oldVelocity != velocity)
+        float torque = _car.MotorTorque;
+        if (_oldTorque != torque)
         {
-            _onVelocityChanged.Invoke(velocity.magnitude);
-            _oldVelocity = velocity;
+            _onVelocityChanged.Invoke(torque);
+            _oldTorque = torque;
         }
 
         if (_car.EngineRPM != _oldRevolutions)

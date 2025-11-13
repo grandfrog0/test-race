@@ -49,6 +49,7 @@ public class CarController : MonoBehaviour
     //private float _maxRPM = 7000f;
     //private float _minRPM = 500f;
     private float _currentMotorTorque;
+    public float MotorTorque => _rigidbody.velocity.magnitude;
     private float _engineRPM;
     private float _gearRatio = 1f;
     private Vector2 _axis;
@@ -116,7 +117,7 @@ public class CarController : MonoBehaviour
         {
             if (!IsStalled)
             {
-                if (_engineRPM <= 1000)
+                if (_engineRPM <= 1000 && _transmission.CurrentGear != 0)
                 {
                     IsStalled = true;
                 }
@@ -136,7 +137,6 @@ public class CarController : MonoBehaviour
                 _transmission.CurrentGear = 1;
             if (!_isGearSwitching)
             {
-                Debug.Log($"{IsReverseDriving} && {_transmission.CurrentGear != -1}");
                 if (IsReverseDriving && _transmission.CurrentGear != -1)
                 {
                     _transmission.ShiftTo(-1);
@@ -153,7 +153,7 @@ public class CarController : MonoBehaviour
             if (_transmission.IsAutomatic)
                 _engineRPM = Mathf.Lerp(_engineRPM, IsStalled || axis.y == 0 || IsStopping ? 0 : MaxRPM, 3000 / MaxRPM * Time.deltaTime);
             else
-                _engineRPM = Mathf.Lerp(_engineRPM, IsStalled || axis.y <= 0 ? 0 : MaxRPM, Time.deltaTime);
+                _engineRPM = Mathf.Lerp(_engineRPM, IsStalled || axis.y <= 0 ? 0 : MaxRPM, 3000 / MaxRPM * Time.deltaTime);
         }
 
         if (_transmission.IsAutomatic && _transmission.CurrentGear == 1)
@@ -164,13 +164,14 @@ public class CarController : MonoBehaviour
             _currentMotorTorque = !IsStalled ? axis.y * _engineRPM * (_currentMotorTorque > _transmission.MaxSpeed ? _transmission.KoefRPM : 1) : 0;
         else
             _currentMotorTorque = !IsStalled ? Mathf.Max(0, axis.y) * _engineRPM * (_currentMotorTorque > _transmission.MaxSpeed ? _transmission.KoefRPM : 1) * reverseKoef : 0;
-        
+
+        _rigidbody.velocity = Vector3.ClampMagnitude(_rigidbody.velocity, _transmission.MinSpeed + (_transmission.MaxSpeed - _transmission.MinSpeed) * MaxRPM / 3000);
 
         if (axis.y != 0 && !_transmission.IsClutchPressed && !_isHandBroken && !IsStalled && _transmission.CurrentGear != 0)
         {
-            _frontLeftWheel.motorTorque = _currentMotorTorque * _speedMultiplier;
-            _frontRightWheel.motorTorque = _currentMotorTorque * _speedMultiplier;
-            _backLeftWheel.motorTorque = _currentMotorTorque * _speedMultiplier;
+            _frontLeftWheel.motorTorque =
+            _frontRightWheel.motorTorque =
+            _backLeftWheel.motorTorque =
             _backRightWheel.motorTorque = _currentMotorTorque * _speedMultiplier;
         }
         else
